@@ -8,7 +8,9 @@ interface EnvVars {
     PRODUCTS_MICROSERVICES_HOST: string;
     PRODUCTS_MICROSERVICES_PORT: number;
     ORDERS_MICROSERVICES_HOST:string;
-   ORDERS_MICROSERVICES_PORT:number;
+    ORDERS_MICROSERVICES_PORT:number;
+    CATEGORY_MICROSERVICES_HOST:string;
+    CATEGORY_MICROSERVICES_PORT:number
 }
 
 const envsSchema = joi.object<EnvVars>({
@@ -18,6 +20,9 @@ const envsSchema = joi.object<EnvVars>({
     
     ORDERS_MICROSERVICES_HOST:joi.string().required(),
     ORDERS_MICROSERVICES_PORT: joi.number().integer().min(1).max(6535).required(),
+
+    CATEGORY_MICROSERVICES_HOST: joi.string().required(),
+    CATEGORY_MICROSERVICES_PORT: joi.number().integer().min(1).max(6535).required(),
 
 }).unknown(true);
 
@@ -40,5 +45,10 @@ export const envs = {
 
     ordersMicroserviceHost: envVars.ORDERS_MICROSERVICES_HOST,
     ordersMicroservicePort: envVars.ORDERS_MICROSERVICES_PORT,
+
+    categoryMicroserviceHost: envVars.CATEGORY_MICROSERVICES_HOST,
+    categoryMicroservicePort: envVars.CATEGORY_MICROSERVICES_PORT,
+
+    
 
 } as const;

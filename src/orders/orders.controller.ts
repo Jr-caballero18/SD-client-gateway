@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Param, Inject, Query, ParseUUIDPipe, UseFilters,  } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Inject, Query, ParseUUIDPipe, UseFilters, Patch,  } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { ORDER_SERVICE } from '../config/service.js';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { OrderPaginationDto } from './dto/order-pagination.js';
 import { firstValueFrom } from 'rxjs';
-import { RpcCustomExceptionFilter } from '../common/index.js';
+import { PaginationDto, RpcCustomExceptionFilter } from '../common/index.js';
+import { StatusDto } from './dto/status.dto.js';
 
 @Controller('orders')
 @UseFilters(RpcCustomExceptionFilter)
@@ -27,7 +28,7 @@ export class OrdersController {
     }
   }
 
-  @Get(':id')
+  @Get('id/:id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     try {
       const order = await firstValueFrom(
@@ -39,5 +40,32 @@ export class OrdersController {
     }
   }
 
+    @Get(':status')
+  async findAllByStatus(@Param()  statusDto: StatusDto, @Query() paginationDto: PaginationDto) {
+    try {
+      const order = await firstValueFrom(
+        this.ordersClient.send({ cmd: 'findAllOrders' }, { ...paginationDto, status: statusDto.status })
+      );
+      return order;
+    } catch (error) {
+      throw new RpcException(error as object);
+    }
+  }
+
+  @Patch(':id')
+  async changeOrderStatus(@Param('id', ParseUUIDPipe) id: string, @Body() statusDto: StatusDto){
+  
+  try{
+    return await firstValueFrom(
+      this.ordersClient.send({cmd: 'changeOrderStatus'}, {id, status: statusDto.status})
+    );
+  }catch(error){
+    throw new RpcException(error as object);
+  }
+
+
+  }
+  //recibir parametro y body y mandarlo al changeorderstatus
+  //@Patch()
 
 }
